@@ -213,8 +213,8 @@ FROM (SELECT
 		GROUP BY maker
 	) X;
 ```
-* Укажите количество имеющихся различных моделей ПК, выпускаемых производителем А.
-вопрос плохо понятен, но пусть будет так.
+###### Укажите количество имеющихся различных моделей ПК, выпускаемых производителем А.
+###### вопрос плохо понятен, но пусть будет так.
 ```
 SELECT 
 	COUNT(DISTINCT model) AS model
@@ -225,6 +225,72 @@ SELECT
 	FROM Product
 WHERE type = 'PC' AND maker = 'A')
 ```
+
+# Использование в запросе нескольких источников записей
+https://partner.sberbank-school.ru/programs/11906/item/460440
+
+##### пример ниявного соединения
+```
+SELECT DISTINCT PC.model, maker
+FROM PC, Product
+WHERE PC.model = Product.model AND
+price < 600;
+```
+
+##### Явные операции соединения
+```
+FROM <таблица 1>
+ [INNER]
+ {{LEFT | RIGHT | FULL } [OUTER]} JOIN <таблица 2>
+[ON <предикат>]
+```
+Служебные слова INNER и OUTER можно опускать, 
+поскольку внешнее соединение однозначно определяется его типом 
+— LEFT (левое), RIGHT (правое) или FULL (полное), 
+а просто JOIN будет означать внутреннее соединение.
+* INNER JOIN
+```
+SELECT 
+	maker, 
+	Product.model AS model_1,
+    PC.model AS model_2, 
+	price
+FROM 
+	Product INNER JOIN PC 
+		ON PC.model = Product.model
+ORDER BY maker, model_2;
+```
+* LEFT JOIN
+```
+SELECT 
+	maker, 
+	Product.model AS model_1, 
+	pc.model AS model_2, 
+	price
+FROM 
+	Product LEFT JOIN PC 
+	ON PC.model = Product.model
+WHERE type = 'pc'
+ORDER BY maker, PC.model;
+```
+`COALESCE`(m_pc.maker, m_printer.maker) - вывести в один столбец
+```
+SELECT COALESCE(m_pc.maker, m_printer.maker) FROM
+(SELECT DISTINCT maker FROM Product WHERE type='pc') m_pc
+FULL JOIN
+(SELECT DISTINCT maker FROM Product WHERE type='printer') m_printer
+ON m_pc.maker = m_printer.maker  
+WHERE m_pc.maker IS NULL OR m_printer.maker IS NULL;
+```
+
+#####Эквисоединения
+* Естественное соединение
+
+`Таблица_1 NATURAL <тип соединения> JOIN  Таблица_2`
+
+* USING соединение не по всем столбцам
+
+`Таблица_1 <тип соединения> JOIN  Таблица_2 USING(<список столбцов>)`
 
 #операции над множествами
 https://partner.sberbank-school.ru/programs/11906/item/460441
