@@ -377,10 +377,47 @@ FROM PC) AS TAB
 WHERE type is NOT NULL;	
 ```
 
+# Реляционное деление
+https://partner.sberbank-school.ru/programs/11906/item/460442
 
-	
-	
+`Product[maker, type] DIVIDE BY Product[type]`
 
+ее нет в языке SQL!
 
+#####  через Группировка
+```
+SELECT maker
+FROM Product
+GROUP BY maker
+HAVING COUNT(DISTINCT type) = (SELECT COUNT(DISTINCT type) FROM Product);
+```
 
+#SOME (ANY) и ALL с предикатами сравнения
+https://partner.sberbank-school.ru/programs/11906/item/460443
 
+`<выражение> <оператор сравнения> SOME | ANY (<подзапрос>)`
+
+Если хотябы для одного ИСТИНА
+```
+SELECT DISTINCT maker
+FROM Product
+WHERE type = 'pc' AND
+  NOT model = ANY (
+	SELECT model
+	FROM PC
+ );
+```
+
+`<выражение> <оператор сравнения> ALL (<подзапрос>)`
+
+Если для всех Истина
+```
+SELECT DISTINCT model, price
+FROM Laptop
+WHERE price > ALL (SELECT price
+ FROM PC
+);
+```
+
+#Преобразование типов и оператор CAST
+https://partner.sberbank-school.ru/programs/11906/item/460444
