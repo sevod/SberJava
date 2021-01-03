@@ -1,13 +1,13 @@
 ﻿https://partner.sberbank-school.ru/programs/9718/item/369256
 #SELECT  И сортировка
-**DISTINCT уникальные поля
+* DISTINCT уникальные поля
 ```SELECT DISTINCT 
 speed,
 ram
 FROM PC
 ```
 
-**ORDER BY упорядочивание, 
+* ORDER BY упорядочивание, 
 ```
 DESC по убыванию
 ASC по возрастанию
@@ -19,27 +19,27 @@ SELECT DISTINCT speed, ram
 FROM PC
 ORDER BY 2 DESC;
 ```
-**сортировка по двум полям
+* сортировка по двум полям
 ```
 SELECT DISTINCT speed, ram
 FROM PC
 ORDER BY ram DESC, speed DESC;
 ```
-**WHERE горизонтальная выборка.
+* WHERE горизонтальная выборка.
 ```
 SELECT DISTINCT speed, ram
 FROM PC
 WHERE price < 500
 ORDER BY 2 DESC;
 ```
-**Сортировка по дате с использованием CONVERT.
+* Сортировка по дате с использованием CONVERT.
 Перед сортировкой все преобразуется в строку.
 ```
 SELECT date
 FROM Battles
 ORDER BY CONVERT(CHAR(5),date,110);
 ```
-**Сортировка по дате с использованием функций MONTH и DAY
+* Сортировка по дате с использованием функций MONTH и DAY
 ```
 SELECT 
 	DAY(date) BD_day, 
@@ -421,3 +421,77 @@ WHERE price > ALL (SELECT price
 
 #Преобразование типов и оператор CAST
 https://partner.sberbank-school.ru/programs/11906/item/460444
+```
+SELECT 'Средняя цена = '+ CAST(AVG(price) AS CHAR(15))
+FROM Laptop;
+```
+
+`CAST(<выражение> AS <тип данных>)`
+
+````
+SELECT CAST(AVG(CAST(launched AS NUMERIC(6,2))) AS NUMERIC(6,2))
+FROM Ships;
+````
+
+#####CONVERT
+
+`SELECT CONVERT(char(25), CONVERT(datetime,'20030722'));`
+
+#Оператор CASE
+https://partner.sberbank-school.ru/programs/11906/item/460445
+````
+SELECT DISTINCT product.model,
+ CASE
+ WHEN price IS NULL
+ THEN 'Нет в наличии'
+ ELSE CAST(price AS CHAR(20))
+ END price
+FROM Product LEFT JOIN
+ PC ON Product.model = PC.model
+WHERE product.type = 'pc';
+````
+1-я форма:
+````
+CASE <проверяемое выражение>
+ WHEN <сравниваемое выражение 1>
+ THEN <возвращаемое значение 1>
+ …
+ WHEN <сравниваемое выражение N>
+ THEN <возвращаемое значение N>
+ [ELSE <возвращаемое значение>]
+END
+````
+2-я форма:
+````
+CASE
+ WHEN <предикат 1>
+ THEN <возвращаемое значение 1>
+ …
+ WHEN <предикат N>
+ THEN <возвращаемое значение N>
+ [ELSE <возвращаемое значение>]
+END
+````
+````
+SELECT DISTINCT model, price,
+ CASE price
+	WHEN (SELECT MAX(price)
+			FROM PC)
+	THEN 'Самый дорогой'
+	WHEN (SELECT MIN(price)
+			FROM PC )
+	THEN 'Самый дешевый'
+	ELSE 'Средняя цена'
+ END comment
+FROM PC
+ORDER BY price;
+````
+
+#####COALESCE - проверка на NULL
+```
+SELECT DISTINCT Product.model,
+ COALESCE(CAST(price AS CHAR(20)),'Нет в наличии') price
+FROM Product LEFT JOIN
+ PC ON Product.model = PC.model
+WHERE Product.type = 'pc';
+```
