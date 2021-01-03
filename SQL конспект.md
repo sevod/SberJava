@@ -495,3 +495,149 @@ FROM Product LEFT JOIN
  PC ON Product.model = PC.model
 WHERE Product.type = 'pc';
 ```
+
+#Операторы модификации данных INSERT UPDATE DELETE
+https://partner.sberbank-school.ru/programs/11906/item/460446
+
+#####INSERT
+````
+INSERT INTO <имя таблицы>[(<имя столбца>,...)]
+{VALUES (<значение столбца>,…)}
+| <выражение запроса>
+| {DEFAULT VALUES}
+````
+
+`CREATE TABLE`
+
+````
+CREATE TABLE product
+(
+ maker char (1) NOT NULL,
+ model varchar (4) NOT NULL,
+ type varchar (7) NOT NULL
+);
+````
+````
+INSERT INTO Productdell
+VALUES ('B', 1157, 'PC');
+````
+
+```
+INSERT INTO Productdell	(type, model, maker)
+VALUES ('PC', 1157, 'B');
+```
+Создание таблицу со значением по умолчанию.
+````
+CREATE TABLE product_D
+(
+ maker char (1) NULL,
+ model varchar (4) NULL,
+ type varchar (7) NOT NULL DEFAULT 'PC'
+);
+````
+
+Используем `DEFAULT`
+
+````
+INSERT INTO Product_D
+VALUES ('B', 1158, DEFAULT);
+````
+
+`INSERT INTO Product_D DEFAULT VALUES;`
+
+Вставка данных с использованием подзапроса.
+
+````
+INSERT INTO Product_D
+SELECT *
+FROM Product
+WHERE type = 'PC';
+````
+
+Вставка нескольких строк с использованием UNION
+
+````
+INSERT INTO Product_D
+SELECT 'B' AS maker, 1158 AS model, 'PC' AS type
+UNION ALL
+SELECT 'C', 2190, 'Laptop'
+UNION ALL
+SELECT 'D', 3219, 'Printer';
+````
+
+#####Конструктор значений таблицы
+
+````
+VALUES
+(<элемент конструктора>, <элемент конструктора>, ...),
+(<элемент конструктора>, <элемент конструктора>, ...),
+...
+(<элемент конструктора>, <элемент конструктора>, ...)
+````
+````
+CREATE TABLE Items (
+item_no int PRIMARY KEY,
+maker char(10),
+type char(10) DEFAULT 'PC',
+value int
+);
+````
+````
+INSERT INTO Items VALUES
+(1, 'A', 'Laptop', 12),
+(2, 'B', DEFAULT, NULL),
+(3, 'C', 'Printer', (SELECT CAST(model AS int) FROM Printer WHERE code=1)),
+(4, 'C', 'Printer', (SELECT CAST(model AS int) FROM Printer WHERE code=77));
+````
+
+#####Оператор UPDATE
+````
+UPDATE <имя таблицы>
+SET {<имя столбца> = {<выражение для вычисления значения столбца>
+| NULL
+| DEFAULT},...}
+[ {WHERE <предикат>}]
+````
+````
+UPDATE Laptop
+SET price = price*0.9;
+````
+````
+UPDATE Laptop
+SET hd = ram/2 
+WHERE hd < 10;
+````
+````
+UPDATE Laptop
+SET hd = 
+CASE
+	WHEN ram < 128
+	THEN 20
+	ELSE 40
+END;
+````
+````
+UPDATE Laptop
+SET speed = 
+	(SELECT MAX(speed)
+	FROM Laptop
+	)
+;
+````
+
+#####Оператор DELETE
+````
+DELETE FROM <имя таблицы >
+[WHERE <предикат>];
+````
+
+````
+DELETE FROM Laptop
+WHERE screen < 12;
+````
+
+Полностью удалить таблицу.
+
+````
+DELETE FROM Laptop;
+````
