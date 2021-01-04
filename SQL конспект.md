@@ -859,3 +859,229 @@ https://partner.sberbank-school.ru/programs/9718/item/369280
 #Функции для работы с данными типа даты/времени
 https://partner.sberbank-school.ru/programs/9718/item/369282
 
+#####Функция DATEADD (datepart, number, date) 
+Функция DATEADD (datepart, number, date) возвращает значение типа datetime,
+
+````
+Datepart
+Допустимые сокращения
+Year — год
+yy, yyyy
+Quarter — квартал
+qq, q
+Month — месяц
+mm, m
+Dayofyear — день года
+dy, y
+Day — день
+dd, d
+Week — неделя
+wk, ww
+Hour — час
+hh
+Minute — минута
+mi, n
+Second — секунда
+ss, s
+Millisecond - миллисекунда
+ms
+````
+````
+SELECT DATEADD(day, 7, current_timestamp);
+SELECT DATEADD(ww, 1, current_timestamp);
+````
+
+#####Функция DATEDIFF
+
+`DATEDIFF(datepart, startdate, enddate)`
+
+````
+SELECT DATEDIFF(dd, 
+	(SELECT MIN(date)
+	FROM pass_in_trip),
+	(SELECT MAX(date)
+	FROM pass_in_trip)
+ );
+````
+
+#####Функция DATEPART
+`DATEPART(datepart , date)`
+````
+SELECT DATEPART(hh, time_out)*60 + DATEPART(mi, time_out)
+FROM Trip
+WHERE trip_no = 1123;
+````
+
+#####Функция DATENAME
+
+Функция DATENAME( datepart, date ) возвращает символьное представление составляющей (datepart) указанной даты (date).
+````
+SELECT DATENAME(weekday, '20171231' )+', ' + DATENAME(day, '20171231') +
+ ' ' + DATENAME(month, '20171231') + ' ' + DATENAME(year,'20171231');
+````
+
+#####Первый день недели
+Пропустил
+
+#####Функция DATEFROMPARTS
+
+`SELECT DATEFROMPARTS(2017, 5, 25);`
+
+#Функции для работы со строками
+https://partner.sberbank-school.ru/programs/9718/item/369283
+
+Пропустил
+
+#Числовые функции в SQL Server
+https://partner.sberbank-school.ru/programs/9718/item/369284
+#####Функция ROUND
+`SELECT round(AVG(hd),2) AS avg_hd FROM pc;`
+
+Пропустил
+
+#CREATE TABLE
+https://partner.sberbank-school.ru/programs/9718/item/369286
+
+`CREATE TABLE <имя таблицы>(<список спецификаций столбцов и ограничений>);`
+
+````
+CREATE TABLE Product (
+	maker varchar(10), 
+	model varchar(50), 
+	type varchar(50));
+````
+#Категорная целостность или целостность сущностей
+https://partner.sberbank-school.ru/programs/9718/item/369287
+
+`Потенциальный ключ`
+
+`PRIMARY KEY` (первичный ключ) и `UNIQUE` (уникальный ключ). 
+Первичный ключ может быть только один в таблице, 
+уникальных же ключей может быть несколько. 
+
+````
+CREATE TABLE Product (
+maker varchar(10),
+model varchar(50) PRIMARY KEY,
+type varchar(50)
+);
+````
+ИЛИ
+````
+CREATE TABLE Product (
+maker varchar(10),
+model varchar(50),
+type varchar(50),
+CONSTRAINT product_PK PRIMARY KEY (model)
+);
+````
+````
+SELECT CONSTRAINT_NAME
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE TABLE_NAME='Product' AND CONSTRAINT_TYPE ='primary key';
+````
+Два первичных ключа (составной ключ)
+````
+CREATE TABLE Outcomes (
+ship varchar(50),
+battle varchar(20),
+result varchar(10),
+PRIMARY KEY(ship, battle)
+);
+````
+
+`UNIQUE` можеть быть несколько для одной таблицы
+````
+CREATE TABLE Outcomes (
+ship varchar(50),
+battle varchar(20),
+result varchar(10),
+out_id int,
+PRIMARY KEY(ship, battle),
+UNIQUE (out_id)
+);
+````
+#Проверочные ограничения
+`CHECK (<предикат>)`
+````
+DROP TABLE Product;
+CREATE TABLE Product (
+maker varchar(10),
+model varchar(50),
+type varchar(50),
+CONSTRAINT product_PK PRIMARY KEY (model),
+CONSTRAINT maker_ch CHECK(maker IS NOT NULL),
+CONSTRAINT type_ch CHECK(type IS NOT NULL)
+);
+````
+
+ИЛИ
+````
+DROP TABLE Product;
+CREATE TABLE Product (
+maker varchar(10) NOT NULL,
+model varchar(50) PRIMARY KEY,
+type varchar(50) NOT NULL
+);
+````
+
+#Оператор ALTER TABLE
+https://partner.sberbank-school.ru/programs/9718/item/369289
+
+`ALTER TABLE` позволит нам изменять структуру таблицы, не пересоздавая её
+
+Можно выделить следующие уровни проверочных ограничений:
+ * уровень атрибута (столбца),
+ * уровень кортежа (строки),
+ * уровень отношения (таблицы).
+ 
+ `CHECK (type IN('printer', 'pc', 'laptop'))`
+ 
+ ````
+ ALTER TABLE Product 
+ ADD CONSTRAINT chk_type CHECK (type IN('pc', 'laptop', 'printer'));
+ ````
+````
+ALTER TABLE Product
+ADD constraint chk_maker_Z CHECK ((maker='Z' AND type= 'printer') OR maker <>'Z');
+````
+
+#Значения по умолчанию
+https://partner.sberbank-school.ru/programs/9718/item/369290
+
+#Ссылочная целостность: внешний ключ
+https://partner.sberbank-school.ru/programs/9718/item/369291
+
+`Внешний ключ (FOREIGN KEY)` – это ограничение, которое поддерживает согласованное состояние данных между двумя таблицами
+
+`FOREIGN KEY(<список столбцов 1> REFERENCES <имя главной таблицы>(<список столбцов 2>)`
+````
+ALTER TABLE PC
+ADD CONSTRAINT fk_pc_product
+FOREIGN KEY(model) REFERENCES Product(model);
+````
+
+Опция для удаления
+
+`ON DELETE <опция>`
+
+Возможны следующие значения опции:
+````
+CASCADE   
+SET NULL
+SET DEFAULT
+NO ACTION (работает по умолчанию)
+````
+
+#Вложенные запросы в проверочных ограничениях
+https://partner.sberbank-school.ru/programs/9718/item/369292
+
+Пропустил, есть разность T-SQL и SQL
+
+#Проверочное ограничение уровня таблицы
+https://partner.sberbank-school.ru/programs/9718/item/369293
+
+Пропустил, есть разность T-SQL и SQL
+
+
+
