@@ -641,3 +641,221 @@ WHERE screen < 12;
 ````
 DELETE FROM Laptop;
 ````
+
+#Оператор MERGE
+https://partner.sberbank-school.ru/programs/11906/item/460448
+
+````
+MERGE Ships AS target  -- таблица, которая будет меняться
+USING (SELECT year(MIN(date)), ship, ship
+       FROM outcomes O JOIN battles B ON O.battle= B.name
+               JOIN Classes C ON C.class=O.ship GROUP BY ship
+      ) AS source (min_year,ship, class)  -- источник данных, который мы рассмотрели выше
+ON (target.name = source.ship)  -- условие связи между источником и изменяемой таблицей
+WHEN MATCHED AND target.launched IS NULL -- если головной корабль есть в таблице Ships
+           -- с неизвестным годом
+    THEN UPDATE SET target.launched = source.min_year -- обновление
+WHEN NOT MATCHED  -- если головного корабля нет в таблице Ships
+    THEN INSERT VALUES(source.ship, source.class, source.min_year) -- вставка
+OUTPUT $action, inserted.*, deleted.*; -- можно вывести измененные строки
+````
+
+#Функции ранжирования
+https://partner.sberbank-school.ru/programs/11906/item/460449
+#####Функция ROW_NUMBER
+
+`ROW_NUMBER`  нумерует строки, возвращаемые запросом. 
+
+`OVER` - задает порядок нумерации строк.
+
+````
+SELECT 
+	row_number() over(ORDER BY trip_no) num,
+    trip_no, 
+	id_comp
+FROM trip
+WHERE ID_comp < 3
+ORDER BY id_comp, trip_no;
+````
+
+`PARTITION BY` задает группы строк, для которых выполняется независимая нумерация
+
+````
+SELECT 
+	row_number() over(partition BY id_comp ORDER BY id_comp,trip_no) num,
+	trip_no, 
+	id_comp
+FROM trip
+WHERE ID_comp < 3
+ORDER BY id_comp, trip_no;
+````
+
+#####Функции RANK() и DENSE_RANK()
+так же нумерует строки
+````
+SELECT *, ROW_NUMBER() OVER(ORDER BY type) num,
+RANK() OVER(ORDER BY type) rnk,
+DENSE_RANK() OVER(ORDER BY type) dense_rnk
+FROM Printer;
+````
+
+
+#####Функция NTILE
+функция возвращает номер группы, в которую попадает соответствующая строка результирующего набора.
+````
+SELECT 
+	*, 
+	NTILE(3) OVER(PARTITION BY v_color ORDER BY v_id) gr
+FROM utv ORDER BY v_color, v_id;
+````
+
+#Оконные функции
+https://partner.sberbank-school.ru/programs/9718/item/369270
+
+ХЗ чего они хотели объяснить в этой теме.
+
+`PARTITION BY ` определяет «окно», т.е. набор строк, 
+характеризуемых равенством значений списка выражений, 
+указанного в этом предложении. 
+
+`OVER()`
+
+````
+CREATE PROCEDURE paging
+@n int -- число записей на страницу
+, @p int =1 -- номер страницы, по умолчанию - первая
+AS
+SELECT * FROM
+ (SELECT *,
+   CASE WHEN num % @n = 0 THEN num/@n ELSE num/@n + 1 END AS page_num,
+   CASE WHEN total % @n = 0 THEN total/@n ELSE total/@n + 1 END AS num_of_pages
+  FROM
+  (SELECT *,
+         ROW_NUMBER() OVER(ORDER BY price DESC) AS num,
+         COUNT(*) OVER() AS total FROM Laptop
+  ) X
+ ) Y
+WHERE page_num = @p;
+GO
+````
+
+`exec paging @n=2, @p=2`
+
+Стандарт SQL Server 2012
+````
+ORDER BY <выражение>
+    [ ASC | DESC ]
+    [ ,...n ]
+[
+OFFSET <целочисленное_выражение_1> { ROW | ROWS }
+[FETCH { FIRST | NEXT } <целочисленное_выражение_2> { ROW | ROWS } ONLY]
+]
+````
+
+
+````
+CREATE PROC paging
+  @n int =2 -- число записей на страницу, по умолчанию 2
+, @p int =1 -- номер страницы, по умолчанию - первая
+AS
+SELECT * FROM Laptop
+ORDER BY price DESC OFFSET @n*(@p-1) ROWS FETCH NEXT @n ROWS ONLY;
+````
+
+Дальше забил на эту тему.
+
+#CROSS APPLY / OUTER APPLY
+https://partner.sberbank-school.ru/programs/9718/item/369271
+
+`CROSS APPLY` - появился в SQL Server 2005. Он позволяет выполнить соединение двух табличных выражений.
+
+`OUTER APPLY`
+
+Тему не прошел.
+
+#Конкатенация строк
+https://partner.sberbank-school.ru/programs/9718/item/369272
+
+`SELECT 1+2+3+4 a, '1'+'2'+'3'+'4' b;`
+
+`CONCAT` - В SQL Server 2012 появилась функция CONCAT, 
+которая выполняет конкатенацию, 
+неявно преобразуя типы аргументов к строковому типу данных.
+
+Изучил вскользь.
+
+#Операторы PIVOT и UNPIVOT
+https://partner.sberbank-school.ru/programs/9718/item/369273
+
+Чтобы объяснить, что такое PIVOT, лучше начать с электронных таблиц EXCEL.
+
+Тему пропустил.
+
+#Общие табличные выражения (CTE)
+https://partner.sberbank-school.ru/programs/9718/item/369274
+
+CTE - Common Table Expression
+
+Забил.
+
+#Функция EOMONTH
+https://partner.sberbank-school.ru/programs/9718/item/369275
+
+В SQL Server 2012 появилась функция EOMONTH, которая позволяет сделать то же самое без применения "процедурной" логики.
+````
+SELECT CAST(
+dateadd(dd, -day(dateadd(mm, 1, current_timestamp)),
+dateadd(mm, 1, current_timestamp)) AS date
+) old_way, eomonth(current_timestamp) new_way;
+````
+
+Тему пропустил.
+
+#Типы данных
+
+О самих типах данных почти ничего нет. Мало понятно для чего это.
+
+#CHAR и VARCHAR
+https://partner.sberbank-school.ru/programs/9718/item/369277
+
+
+`СНAR` – фиксированные текстовые строки до 2000 байт.
+
+`VARCHAR` — текстовые строки переменной длины до 4000 байт
+
+* значение по умолчанию, для VARCHAR равно 30 (это о T-SQL?)
+
+* Согласно стандарту, если для типов CHAR и VARCHAR размер не указан, то подразумевается CHAR(1) и VARCHAR(1) соответственно.
+
+#Float(n)
+https://partner.sberbank-school.ru/programs/9718/item/369278
+
+#Целочисленное деление
+https://partner.sberbank-school.ru/programs/9718/item/369279
+
+Операция "/" просто обозначает целочисленное деление 
+(а именно, дает в результате неполное частное) если операнды являются целыми числами.
+
+`SELECT CAST(1 AS DEC(12,4))/3 AS a, 5./3 AS b;`
+
+Операция получения остатка от деления в SQL Server обозначается "%"
+
+`SELECT 1 % 3 AS a, 5 % 3 AS b;`
+
+#Методы типа данных XML
+https://partner.sberbank-school.ru/programs/9718/item/369280
+
+Тип данных XML впервые появился в SQL Server 2005. 
+Он может содержать до 2 Гб данных.
+
+* query() – используется для извлечения XML фрагментов из XML документов;
+* value() – используется для извлечения значений конкретных узлов или атрибутов XML документов;
+* exist() – используется для проверки существования узла или атрибута. Возвращает 1, если узел или атрибут найден, и 0, если не найден;
+* modify() – изменяет XML документ;
+* nodes() – разделяет XML документ на несколько строк по узлам.
+
+Зачем нам XML в SQL??? Дальше забил.
+
+#Функции для работы с данными типа даты/времени
+https://partner.sberbank-school.ru/programs/9718/item/369282
+
