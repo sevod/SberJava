@@ -6,3 +6,8 @@
     System.out.println(name);
     System.out.println(age);
 ````
+
+finalize() срабатывает при удалении обьекта
+
+    protected void finalize() throws Throwable{
+    }
