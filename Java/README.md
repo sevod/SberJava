@@ -164,4 +164,23 @@ removeLast()
     yearStartTime.setDate(1); // первое число 
     yearStartTime.setMonth(0); // месяц январь, нумерация для месяцев 0-11
     
+# try-catch
+https://partner.sberbank-school.ru/programs/9719/item/369552
+
+    try{                         // используем блок try
+      
+    }
+    catch(Exception e){            // используем блок catch для перехвата ошибки
+       
+    }
+    
+`Exception` - это класс ислючений    
+
+контролируемые(cheked) и неконтролируемые(uncheked)
+
+Контролируемые исключения необходимо перехватывать.
+
+    catch (Exception e){
+            e.printStackTrace();
+    
           

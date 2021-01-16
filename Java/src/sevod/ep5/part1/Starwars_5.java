@@ -1,4 +1,4 @@
-package sevod.ep5;
+package sevod.ep5.part1;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
