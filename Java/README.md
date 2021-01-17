@@ -182,5 +182,27 @@ https://partner.sberbank-school.ru/programs/9719/item/369552
 
     catch (Exception e){
             e.printStackTrace();
+
+###наследование
+https://partner.sberbank-school.ru/programs/9719/item/369666
+
+`extends` - наследовать
+
+`super()` - обращение к родителю
+
+    //это конструктор
+    class Pet extends Owner{
+        public Pet(String name){
+            super(name);
+            this.kind = kind;
+        }        
+    }
     
-          
+`@Override` - переопределение   
+
+`final` - запрещает наследование или переопределение методов
+
+    final class Owner{
+    
+    public final void say(){
+    
