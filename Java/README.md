@@ -231,3 +231,24 @@ https://partner.sberbank-school.ru/programs/9719/item/369738
                 System.out.println((char)fileInputStream.read());
             }
             fileInputStream.close();    
+            
+###Методы класса Object
+https://javarush.ru/quests/lectures/questmultithreading.level01.lecture03
+
+toString(), hashCode(), getClass(), equals(). (не полный список)        
+
+автоматически можно производить восходящие преобразования от подкласса к суперклассу
+
+приведение типа суперкласса к подклассу 
+
+    Object spike = new Dog("Spike", "brown");
+    // нисходящее преобразование от Object к типу Dog
+    Dog dog = (Dog)spike;
+    
+`instanceof` проперка типа данных
+
+    if(spike instanceof Cat){
+        ((Cat)spike).display();
+    }
+
+     
