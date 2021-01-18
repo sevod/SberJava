@@ -251,4 +251,19 @@ toString(), hashCode(), getClass(), equals(). (не полный список)
         ((Cat)spike).display();
     }
 
-     
+###Пример синглтона (возможно не правильный), не учитывает многопоточность
+
+    public class Singleton {
+        private static Singleton singleton = null;
+    
+        public static Singleton getSingleton() {
+            if (singleton != null)
+                return singleton;
+            singleton = new Singleton();
+            return singleton;
+        }
+    
+        private Singleton() {
+            this.singleton = singleton;
+        }
+    }     
